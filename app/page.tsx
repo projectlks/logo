@@ -105,7 +105,7 @@ function GalleryImageCard({ card }: { card: GalleryCard }) {
 
 export default function Page() {
   return (
-    <div className="bg-white px-4 py-6 pb-10 sm:px-6 sm:py-8 sm:pb-12 md:px-10 md:py-11 md:pb-16">
+    <div className="bg-white text-black px-4 py-6 pb-10 sm:px-6 sm:py-8 sm:pb-12 md:px-10 md:py-11 md:pb-16">
       <div className="flex justify-between">
         <span className="w-26 h-6 bg-[#A5B2BB] inline-block rounded-full"></span>
 
