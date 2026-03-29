@@ -1,15 +1,13 @@
 import Image from "next/image";
 
-type GalleryCard = {
+type ImageAsset = {
   src: string;
   width: number;
   height: number;
-  wrapperClassName: string;
 };
-type WideGalleryCard = {
-  src: string;
-  width: number;
-  height: number;
+
+type GalleryCard = ImageAsset & {
+  wrapperClassName: string;
 };
 
 const BLACK_CARD_CLASS =
@@ -19,90 +17,44 @@ const WHITE_CARD_CLASS =
 const UNOPTIMIZED_IMAGE_SRCS = new Set(["/0.gif", "/4.png", "/6.gif"]);
 const EAGER_IMAGE_SRCS = new Set(["/1.png"]);
 
-const GALLERY_CARDS: GalleryCard[] = [
+const createGalleryCard = (
+  src: string,
   {
-    src: "/1.png",
-    width: 700,
-    height: 700,
-    wrapperClassName: BLACK_CARD_CLASS,
-  },
-  {
-    src: "/2.png",
-    width: 700,
-    height: 700,
-    wrapperClassName: BLACK_CARD_CLASS,
-  },
-  {
-    src: "/3.png",
-    width: 700,
-    height: 700,
-    wrapperClassName: BLACK_CARD_CLASS,
-  },
-  {
-    src: "/4.png",
-    width: 700,
-    height: 700,
-    wrapperClassName: BLACK_CARD_CLASS,
-  },
-  {
-    src: "/5.png",
-    width: 700,
-    height: 700,
-    wrapperClassName: BLACK_CARD_CLASS,
-  },
-  {
-    src: "/6.gif",
+    width = 700,
+    height = 700,
+    wrapperClassName = BLACK_CARD_CLASS,
+  }: Partial<GalleryCard> = {},
+): GalleryCard => ({
+  src,
+  width,
+  height,
+  wrapperClassName,
+});
+
+const PRIMARY_GALLERY_CARDS: GalleryCard[] = [
+  createGalleryCard("/1.png"),
+  createGalleryCard("/2.png"),
+  createGalleryCard("/3.png"),
+  createGalleryCard("/4.png"),
+  createGalleryCard("/5.png"),
+  createGalleryCard("/6.gif", {
     width: 200,
     height: 200,
     wrapperClassName: WHITE_CARD_CLASS,
-  },
-  {
-    src: "/8.png",
-    width: 700,
-    height: 700,
-    wrapperClassName: BLACK_CARD_CLASS,
-  },
-  {
-    src: "/9.png",
-    width: 700,
-    height: 700,
-    wrapperClassName: BLACK_CARD_CLASS,
-  },
-  {
-    src: "/10.png",
-    width: 700,
-    height: 700,
-    wrapperClassName: BLACK_CARD_CLASS,
-  },
-];
-const GALLERY_CARDS2: GalleryCard[] = [
-  {
-    src: "/11.png",
-    width: 700,
-    height: 700,
-    wrapperClassName: BLACK_CARD_CLASS,
-  },
-  {
-    src: "/12.png",
-    width: 700,
-    height: 700,
-    wrapperClassName: BLACK_CARD_CLASS,
-  },
-  {
-    src: "/13.png",
-    width: 700,
-    height: 700,
-    wrapperClassName: BLACK_CARD_CLASS,
-  },
-  {
-    src: "/14.png",
-    width: 700,
-    height: 700,
-    wrapperClassName: BLACK_CARD_CLASS,
-  },
+  }),
+  createGalleryCard("/8.png"),
+  createGalleryCard("/9.png"),
+  createGalleryCard("/10.png"),
 ];
 
-const WIDE_GALLERY_CARDS: WideGalleryCard[] = Array.from(
+const SECONDARY_GALLERY_CARDS: GalleryCard[] = [
+  createGalleryCard("/11.png"),
+  createGalleryCard("/12.png"),
+  createGalleryCard("/13.png"),
+  createGalleryCard("/14.png"),
+];
+
+const WIDE_GALLERY_CARDS: ImageAsset[] = Array.from(
   { length: 19 },
   (_, index) => ({
     src: `/${index + 15}.png`,
@@ -110,9 +62,50 @@ const WIDE_GALLERY_CARDS: WideGalleryCard[] = Array.from(
     height: 360,
   }),
 );
+
+type SiteImageProps = ImageAsset & {
+  className?: string;
+  includeRatioData?: boolean;
+};
+
+function SiteImage({
+  src,
+  width,
+  height,
+  className,
+  includeRatioData = false,
+}: SiteImageProps) {
+  return (
+    <Image
+      className={className}
+      alt=""
+      {...(includeRatioData ? { "data-heightwidthratio": "1" } : {})}
+      width={width}
+      height={height}
+      src={src}
+      loading={EAGER_IMAGE_SRCS.has(src) ? "eager" : undefined}
+      unoptimized={UNOPTIMIZED_IMAGE_SRCS.has(src)}
+    />
+  );
+}
+
+function GalleryImageCard({ card }: { card: GalleryCard }) {
+  return (
+    <div className={card.wrapperClassName}>
+      <SiteImage
+        className="block"
+        src={card.src}
+        width={card.width}
+        height={card.height}
+        includeRatioData
+      />
+    </div>
+  );
+}
+
 export default function Page() {
   return (
-    <div className="px-10 py-11 pb-16">
+    <div className="bg-white px-4 py-6 pb-10 sm:px-6 sm:py-8 sm:pb-12 md:px-10 md:py-11 md:pb-16">
       <div className="flex justify-between">
         <span className="w-26 h-6 bg-[#A5B2BB] inline-block rounded-full"></span>
 
@@ -122,16 +115,14 @@ export default function Page() {
           </span>
         </div>
       </div>
-      <div className="mt-11 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+      <div className="mt-11 grid grid-cols-2  lg:grid-cols-4 gap-10">
         <div className="rounded-[28px] lg:col-span-1 col-span-2 lg:aspect-square">
-          <Image
+          <SiteImage
             className="block"
-            alt=""
-            data-heightwidthratio="1"
+            includeRatioData
             width={88}
             height={88}
             src="/0.gif"
-            unoptimized={UNOPTIMIZED_IMAGE_SRCS.has("/0.gif")}
           />
           <div className="mt-16 text-[22px]">
             <p className="font-bold">iconwerk,</p>
@@ -140,19 +131,8 @@ export default function Page() {
             </p>
           </div>
         </div>
-        {GALLERY_CARDS.map((card) => (
-          <div key={card.src} className={card.wrapperClassName}>
-            <Image
-              className="block"
-              alt=""
-              data-heightwidthratio="1"
-              width={card.width}
-              height={card.height}
-              src={card.src}
-              loading={EAGER_IMAGE_SRCS.has(card.src) ? "eager" : undefined}
-              unoptimized={UNOPTIMIZED_IMAGE_SRCS.has(card.src)}
-            />
-          </div>
+        {PRIMARY_GALLERY_CARDS.map((card) => (
+          <GalleryImageCard key={card.src} card={card} />
         ))}
         <div className="lg:aspect-square text-[22px] lg:col-span-1 col-span-2">
           <p className="font-bold">Simple, clear, useful.</p>
@@ -163,29 +143,16 @@ export default function Page() {
         </div>
       </div>
       <div className="mt-11 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
-        {GALLERY_CARDS2.map((card) => (
-          <div key={card.src} className={card.wrapperClassName}>
-            <Image
-              className="block"
-              alt=""
-              data-heightwidthratio="1"
-              width={card.width}
-              height={card.height}
-              src={card.src}
-              loading={EAGER_IMAGE_SRCS.has(card.src) ? "eager" : undefined}
-              unoptimized={UNOPTIMIZED_IMAGE_SRCS.has(card.src)}
-            />
-          </div>
+        {SECONDARY_GALLERY_CARDS.map((card) => (
+          <GalleryImageCard key={card.src} card={card} />
         ))}
       </div>
       <span className="w-26 h-6 bg-[#A5B2BB] inline-block rounded-full my-27.5 "></span>
-      <Image
+      <SiteImage
         className="block h-17.5"
-        alt=""
         width={300}
         height={200}
         src="/l.svg"
-        unoptimized={UNOPTIMIZED_IMAGE_SRCS.has("/l.svg")}
       />
       <div className="min-h-17.5 ">
         <p className=" text-[24px] mt-13 ">
@@ -193,74 +160,59 @@ export default function Page() {
         </p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 mt-18 ">
-        <Image
+        <SiteImage
           className="block w-full"
-          alt=""
           width={760}
           height={530}
           src="/l1.png"
-          unoptimized={UNOPTIMIZED_IMAGE_SRCS.has("/l1.png")}
         />
-        <Image
+        <SiteImage
           className="block w-full"
-          alt=""
           width={760}
           height={530}
           src="/r1.png"
-          unoptimized={UNOPTIMIZED_IMAGE_SRCS.has("/l1.png")}
         />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5.5 mt-40 ">
         {WIDE_GALLERY_CARDS.map((card) => (
           <div key={card.src} className="w-full rounded-[28px] overflow-hidden">
-            <Image
+            <SiteImage
               className="block w-full"
-              alt=""
-              data-heightwidthratio="1"
+              includeRatioData
               width={card.width}
               height={card.height}
               src={card.src}
-              loading={EAGER_IMAGE_SRCS.has(card.src) ? "eager" : undefined}
-              unoptimized={UNOPTIMIZED_IMAGE_SRCS.has(card.src)}
             />
           </div>
         ))}
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 mt-18 ">
-        <Image
+        <SiteImage
           className="block w-full"
-          alt=""
           width={760}
           height={530}
           src="/l2.png"
-          unoptimized={UNOPTIMIZED_IMAGE_SRCS.has("/l2.png")}
         />
-        <Image
+        <SiteImage
           className="block w-full"
-          alt=""
           width={760}
           height={530}
           src="/r2.png"
-          unoptimized={UNOPTIMIZED_IMAGE_SRCS.has("/r2.png")}
         />
       </div>
       <span className="w-26 h-6 bg-[#A5B2BB] inline-block rounded-full my-18 "></span>
-      <Image
+      <SiteImage
         className="block w-20"
-        alt=""
         width={760}
         height={530}
         src="/w.svg"
-        unoptimized={UNOPTIMIZED_IMAGE_SRCS.has("/w.svg")}
       />
       <p className="mt-8 mb-20 text-2xl font-bold">Let’s work together!</p>
-      <Image
+      <SiteImage
         className="block rounded-[28px] overflow-hidden"
-        alt=""
         width={360}
         height={360}
         src="/p.png"
-        unoptimized={UNOPTIMIZED_IMAGE_SRCS.has("/p.png")}
       />
       <div className="md:w-1/2 w-full  text-[22px]  ">
         <p className="my-6">
@@ -272,40 +224,32 @@ export default function Page() {
       </div>
 
       <div className="flex gap-5 h-16 mt-16 mb-36 ">
-        <Image
+        <SiteImage
           className="block rounded-[28px] overflow-hidden"
-          alt=""
           width={181}
           height={64}
           src="/email.svg"
-          unoptimized={UNOPTIMIZED_IMAGE_SRCS.has("/email.svg")}
-        />{" "}
-        <Image
+        />
+        <SiteImage
           className="block rounded-[28px] overflow-hidden"
-          alt=""
           width={64}
           height={64}
           src="/x.svg"
-          unoptimized={UNOPTIMIZED_IMAGE_SRCS.has("/x.svg")}
-        />{" "}
-        <Image
+        />
+        <SiteImage
           className="block rounded-[28px] overflow-hidden"
-          alt=""
           width={64}
           height={64}
           src="/ig.svg"
-          unoptimized={UNOPTIMIZED_IMAGE_SRCS.has("/ig.svg")}
         />
       </div>
 
       <span className="w-26 h-6 bg-[#A5B2BB] inline-block rounded-full mb-18 "></span>
 
-      <Image
-        alt=""
+      <SiteImage
         width={80}
         height={80}
         src="/pencil.svg"
-        unoptimized={UNOPTIMIZED_IMAGE_SRCS.has("/pencil.svg")}
       />
       <div className="md:w-1/2 w-full">
         <p className="text-[22px] mt-7.5 mb-1">Smallprint, etc.</p>
