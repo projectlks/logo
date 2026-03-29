@@ -115,7 +115,7 @@ export default function Page() {
           </span>
         </div>
       </div>
-      <div className="mt-11 grid grid-cols-2  lg:grid-cols-4 gap-10">
+      <div className="mt-11 grid grid-cols-2  lg:grid-cols-4  gap-4 md:gap-10">
         <div className="rounded-[28px] lg:col-span-1 col-span-2 lg:aspect-square">
           <SiteImage
             className="block"
@@ -142,7 +142,7 @@ export default function Page() {
           </p>
         </div>
       </div>
-      <div className="mt-11 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+      <div className="mt-11 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-10">
         {SECONDARY_GALLERY_CARDS.map((card) => (
           <GalleryImageCard key={card.src} card={card} />
         ))}
